@@ -1,0 +1,396 @@
+
+import { SpinBox } from "std-widgets.slint";
+export component BorderlessWindow inherits Window{
+    no-frame: true;
+    resize-border-width: 0px;
+    icon: @image-url("../../assets/icons/icon.ico");
+    // 启动时窗口大小
+    min-width: 1020px;
+    min-height: 600px;
+    
+    default-font-family: "Microsoft YaHei, Noto Sans CJK SC, Noto Sans CJK JP, Noto Sans CJK KR, PingFang SC, Hiragino Sans, Malgun Gothic, sans-serif";
+    in property <image> background-image: @image-url("");
+    in property <brush> title-background: transparent;
+    in property <brush> content-background: #fdfdfd;
+    in property <brush> title-text-color: white;
+    in property <string> parent;
+    in property <length> border-width: 0px;
+    in property <brush> border-color: #454158;
+
+    in property <length> title-height: 40px;
+    in property <length> title-button-size: 32px;
+    in property <int> tab-button-font-weight:600;
+
+    property <bool> drag-area-pressed: false;
+    property <length> drag-area-down-x: 0;
+    property <length> drag-area-down-y: 0;
+
+    property <bool> is-maximized: false;
+    
+    callback on-close-window();
+    callback on-move-window(length, length);
+    callback on-minimized-window(bool);
+    callback on-maximized-window(bool);
+
+    function resize-window(width: length, height: length) {
+        if(width < root.min-width){
+            root.width = root.min-width;
+        }else{
+            root.width = width;
+        }
+        if(height < root.min-height){
+            root.height = root.min-height;
+        }else{
+            root.height = height;
+        }
+    }
+
+    function process-drag-event(idx: int, ev: PointerEvent, x: length, y: length) {
+        if(ev.kind == PointerEventKind.down){
+            drag-area-down-x = x;
+            drag-area-down-y = y;
+            drag-area-pressed = true;
+        }
+        if(ev.kind == PointerEventKind.move){
+            if(!drag-area-pressed){
+                return;
+            }
+            //拖动窗口
+            if (idx == 0){
+                on-move-window(x - drag-area-down-x, y - drag-area-down-y);
+            }else if (idx == 1){
+                //上边框
+                on-move-window(0, y - drag-area-down-y);
+                resize-window(root.width, root.height - (y - drag-area-down-y));
+            }else if (idx == 2){
+                //右边框
+                resize-window(root.width + (x - drag-area-down-x), root.height);
+            }else if (idx == 3){
+                //下边框
+                resize-window(root.width, root.height + (y - drag-area-down-y));
+            }else if (idx == 4){
+                //左边框
+                on-move-window(x - drag-area-down-x, 0);
+                resize-window(root.width - (x - drag-area-down-x), root.height);
+            }else if (idx == 5){
+                //左上角
+                on-move-window(x - drag-area-down-x, y - drag-area-down-y);
+                resize-window(root.width - (x - drag-area-down-x), root.height - (y - drag-area-down-y));
+            }else if (idx == 6){
+                //右上角
+                on-move-window(0, y - drag-area-down-y);
+                resize-window(root.width + (x - drag-area-down-x), root.height - (y - drag-area-down-y));
+            }else if (idx == 7){
+                //右下角
+                resize-window(root.width + (x - drag-area-down-x), root.height + (y - drag-area-down-y));
+            }else if (idx == 8){
+                //左下角
+                on-move-window(x - drag-area-down-x, 0);
+                resize-window(root.width - (x - drag-area-down-x), root.height + (y - drag-area-down-y));
+            }
+        }
+        if(ev.kind == PointerEventKind.up || ev.kind == PointerEventKind.up){
+            drag-area-pressed = false;
+        }
+    }
+
+    // 上边框点击区域
+    top-border-touch:= TouchArea{
+        mouse-cursor: row-resize;
+        width: 100%;
+        height: root.border-width;
+        x: 0;
+        y: 0;
+        pointer-event(ev) => {
+            process-drag-event(1, ev, self.mouse-x, self.mouse-y);
+        }
+    }
+    
+    // 右边框点击区域
+    right-border-touch:= TouchArea{
+        mouse-cursor: col-resize;
+        width: root.border-width;
+        height: 100%;
+        x: root.width - root.border-width;
+        y: 0;
+        pointer-event(ev) => {
+            process-drag-event(2, ev, self.mouse-x, self.mouse-y);
+        }
+    }
+
+    // 下边框点击区域
+    bottom-border-touch:= TouchArea{
+        mouse-cursor: row-resize;
+        width: 100%;
+        height: root.border-width;
+        x: 0;
+        y: root.height - root.border-width;
+        pointer-event(ev) => {
+            process-drag-event(3, ev, self.mouse-x, self.mouse-y);
+        }
+    }
+
+    // 左边框点击区域
+    left-border-touch:= TouchArea{
+        mouse-cursor: col-resize;
+        width: root.border-width;
+        height: 100%;
+        x: 0;
+        y: 0;
+        pointer-event(ev) => {
+            process-drag-event(4, ev, self.mouse-x, self.mouse-y);
+        }
+    }
+
+    // 左上角点击区域
+    left-top-border-touch:= TouchArea{
+        mouse-cursor: nw-resize;
+        width: root.border-width;
+        height: root.border-width;
+        x: 0;
+        y: 0;
+        pointer-event(ev) => {
+            process-drag-event(5, ev, self.mouse-x, self.mouse-y);
+        }
+    }
+    // 右上角点击区域
+    right-top-border-touch:= TouchArea{
+        mouse-cursor: sw-resize;
+        width: root.border-width;
+        height: root.border-width;
+        x: root.width - root.border-width;
+        y: 0;
+        pointer-event(ev) => {
+            process-drag-event(6, ev, self.mouse-x, self.mouse-y);
+        }
+    }
+    //右下角点击区域
+    right-bottom-border-touch:= TouchArea{
+        mouse-cursor: nw-resize;
+        width: root.border-width;
+        height: root.border-width;
+        x: root.width - root.border-width;
+        y: root.height - root.border-width;
+        pointer-event(ev) => {
+            process-drag-event(7, ev, self.mouse-x, self.mouse-y);
+        }
+    }
+    //左下角点击区域
+    left-bottom-border-touch:= TouchArea{
+        mouse-cursor: sw-resize;
+        width: root.border-width;
+        height: root.border-width;
+        x: 0;
+        y: root.height - root.border-width;
+        pointer-event(ev) => {
+            process-drag-event(8, ev, self.mouse-x, self.mouse-y);
+        }
+    }
+
+    VerticalLayout {
+        padding: root.border-width;
+       // width: 100%;
+     
+       // background: content-background;
+        //标题栏
+        Rectangle {
+            
+            height: title-height;
+            background: title-background;
+            HorizontalLayout {
+                padding-right: 7px;
+                padding-left: 7px;
+/*
+                Image {
+                    
+                    width:24px;
+                    height:24px;
+                    source: @image-url("../assets/icons/icon.png");
+                    image-rendering: smooth;
+                    accessible-role: none;
+                    TouchArea {
+                        pointer-event(ev) => {
+                            process-drag-event(0, ev, self.mouse-x, self.mouse-y);
+                        }
+                    }
+                }*/
+                Rectangle {
+                    width: 80px;
+                    //y: 4px;
+                    //border-radius:2px;
+                    //width: title-button-size;
+                    //height: title-button-size;
+                    //background: root.border-color;
+                    TouchArea {
+                        pointer-event(ev) => {
+                            process-drag-event(0, ev, self.mouse-x, self.mouse-y);
+                        }
+                        clicked => {  }
+                    }
+                    //background: touch-forum.has-hover? touch-forum.pressed? red: red: title-background;
+                    Text {
+                        
+                        font-size: 12px;
+                        font-weight: 300;
+                        color: title-text-color;
+                        
+                        text: "8：36 UTC";
+                    }
+                }
+                Rectangle {
+                    width:7px;
+                }
+                Rectangle {
+                    width: 80px;
+                    //y: 4px;
+                    //border-radius:2px;
+                    //width: title-button-size;
+                    //height: title-button-size;
+                    //background: root.border-color;
+                    touch-forum:=TouchArea {
+                        clicked => {  }
+                    }
+                    background: touch-forum.has-hover? touch-forum.pressed? red: red: title-background;
+                    Text {
+                        
+                        font-size: touch-forum.has-hover? touch-forum.pressed? 17px: 18px : 18px;
+                        font-weight: tab-button-font-weight;
+                        color: touch-forum.has-hover? touch-forum.pressed? title-text-color: title-text-color : gray;
+                        
+                        text: "FORUM";
+                    }
+                }
+                Rectangle {
+                    width: 80px;
+                    //y: 4px;
+                    //border-radius:2px;
+                    //width: title-button-size;
+                    //height: title-button-size;
+                    //background: root.border-color;
+                    touch-news:=TouchArea {
+                        clicked => {  }
+                    }
+                    
+                    background: touch-news.has-hover? touch-news.pressed? red: red: title-background;
+                    Text {
+                        
+                        font-size: touch-news.has-hover? touch-news.pressed? 17px: 18px : 18px;
+                        font-weight: tab-button-font-weight;
+                        color: touch-news.has-hover? touch-news.pressed? title-text-color: title-text-color : gray;
+                        
+                        text: "NEWS";
+                    }
+                }
+                Rectangle {
+                    width: 80px;
+                    //y: 4px;
+                    //border-radius:2px;
+                    //width: title-button-size;
+                    //height: title-button-size;
+                    //background: root.border-color;
+                    touch-shop:=TouchArea {
+                        clicked => {  }
+                    }
+                    background: touch-shop.has-hover? touch-shop.pressed? red: red: title-background;
+                    Text {
+                        
+                        font-size: touch-shop.has-hover? touch-shop.pressed? 17px: 18px : 18px;
+                        font-weight: tab-button-font-weight;
+                        color: touch-shop.has-hover? touch-shop.pressed? title-text-color: title-text-color : gray;
+                        
+                        text: "SHOP";
+                    }
+                }
+                //标题
+                Text {
+                    text: root.title;
+                    color: title-text-color;
+                    vertical-alignment: center;
+                    TouchArea {
+                        pointer-event(ev) => {
+                            process-drag-event(0, ev, self.mouse-x, self.mouse-y);
+                        }
+                    }
+                }
+                //最小化按钮
+                //Rectangle {
+                    Rectangle {
+                        y: 4px;
+                        border-radius:2px;
+                        width: title-button-size;
+                        height: title-button-size;
+                        //background: root.border-color;
+                        touch-minize := TouchArea {
+                            clicked => { on-minimized-window(true) }
+                        }
+                        Text {
+                            font-size: 22px;
+                            color: touch-minize.has-hover? touch-minize.pressed? gray: title-text-color : gray;
+                            text: "-";
+                        }
+                    }
+                    //width: 24px;
+                //}
+               Rectangle {
+                width:3px;
+            }
+                //最大化按钮
+                //Rectangle {
+                /*
+                    Rectangle {
+                        y: 4px;
+                        border-radius: 2px;
+                        width: title-button-size;
+                        height: title-button-size;
+                        background: root.border-color;
+                        touch-maximized := TouchArea {
+                            clicked => {
+                                is-maximized = !is-maximized;
+                                on-maximized-window(is-maximized);
+                            }
+                        }
+                        Text {
+                            color: touch-maximized.has-hover? touch-maximized.pressed? gray: title-text-color : lightgray;
+                            text: is-maximized?"❐":"□";
+                        }
+                    }*/
+                    //width: 24px;
+                //}
+                /*
+                Rectangle {
+                    width:3px;
+                }*/
+                //关闭按钮
+                Rectangle {
+                    y: 4px;
+                    
+                    border-radius: 2px;
+                    width: title-button-size;
+                    height: title-button-size;
+                    //background: root.border-color;
+                    touch-close := TouchArea {
+                        clicked => { on-close-window() }
+                    }
+                    Text {
+                        font-size: 16px;
+                        color: touch-close.has-hover? touch-close.pressed? gray: title-text-color : gray;
+                        text: "x";
+                    }
+                }
+            }
+        }
+        
+        Rectangle {
+            width: 100%;
+            height: 100%;
+            //background: content-background;
+            Image {
+                y:0px;
+                opacity: 0.8;
+                source:background-image;
+            }
+            @children
+
+        }
+    }
+}

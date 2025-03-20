@@ -1,0 +1,18 @@
+import { VerticalBox , HorizontalBox, Button, TextEdit, GridBox} from "std-widgets.slint";
+import { ClientFrame } from "frames/client-frame.slint";
+
+export component SettingsFrame inherits ClientFrame {
+    title: "Settings";
+    //preferred-width: 1020px;
+   // preferred-height: 600px;
+    
+
+    callback settings-btn-pressed();
+
+    callback close-window();
+ 
+    on-close-window() => {
+        close-window();
+    }
+
+}

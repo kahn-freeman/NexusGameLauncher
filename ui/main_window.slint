@@ -1,0 +1,144 @@
+
+import { VerticalBox , HorizontalBox, Button, TextEdit, GridBox, TabWidget} from "std-widgets.slint";
+import { BorderlessWindow } from "frames/borderless-window.slint";
+import { IconButton } from "compoment/icon_button.slint";
+import {SettingsFrame} from "settings_frame.slint";
+import { ButtonEx } from "compoment/button_ex.slint";
+
+export component MainWindow inherits BorderlessWindow {
+    title: "";
+    //"Nexusl Lanucher v 1.0.12";//"😀你好，Slint！";
+    preferred-width: 1020px;
+    preferred-height: 600px;
+    background-image: @image-url("../assets/images/background.jpg");
+
+    callback settings-btn-pressed();
+    callback account-btn-pressed <=> AccountButton.on-clicked;
+    callback support-btn-pressed <=> SupportButton.on-clicked;
+
+    callback close-window();
+    callback minimized-window(bool);
+    callback maximized-window(bool);
+    callback move-window(length, length);
+    callback mouse-down(int, int);
+    callback mouse-move(int, int);
+
+    on-close-window() => {
+        close-window();
+    }
+
+    on-minimized-window(enable) => {
+        minimized-window(enable);
+    }
+
+    on-maximized-window(enable) => {
+        maximized-window(enable);
+    }
+
+    on-move-window(offset-x, offset-y) => {
+        move-window(offset-x, offset-y);
+    }
+
+    HorizontalLayout {
+
+        Rectangle {
+            width: 6%;
+        //height:100%;
+        background: rgba(0, 0, 0, 0.8);
+            VerticalLayout {
+                spacing: 22px;
+
+                Rectangle {
+                //horizontal-stretch: 1;
+                height: 48%;
+                    background: transparent;
+                }
+            /*
+            settings_window:=Settings {
+                title: "Settings";
+                //Rectangle { height:100%; width: 100%; background: yellow; }
+                //x: 20px; y: 20px; height: 50px; width: 50px;
+
+            }*/
+
+            AccountButton := IconButton {
+                    icon-source: @image-url("../assets/icons/button/barbute.png");
+                    text-label: "Account";
+                }
+
+                SupportButton := IconButton {
+                    icon-source: @image-url("../assets/icons/button/halt.png");
+                    text-label: "Support";
+                }
+
+                SettingsButton := IconButton {
+                    icon-source: @image-url("../assets/icons/button/cog.png");
+                    text-label: "Settings";
+                    on-clicked => {
+                    //self.text-label="123";
+                    //settings_window.show();
+                    frame-shadow.visible=true;
+                    m_setting-frame.visible = true;
+                    //settings-btn-pressed();
+                }
+                }
+            }
+        }
+
+        frame-shadow:=Rectangle {
+            visible:false;
+            width: 100%;
+            background: rgba(0,0,0,0.7);
+            VerticalLayout {
+                    //padding-bottom: 80px;
+                    padding-top: 40px;
+                    padding-left: 40px;
+                    padding-right: 110px;
+                    m_setting-frame := SettingsFrame {
+
+                    visible: false;
+                    //width: 90%;
+                    height: 450px;
+                    VerticalLayout {
+                        TabWidget {
+                            current-index: 0;
+                            
+                            Tab {
+                                
+                                title: "General";
+                                Rectangle {
+                                    background: black;
+                                }
+                            }
+
+                            Tab {
+                                title: "Graphics";
+                                Rectangle {
+                                    background: black;
+                                }
+                            }
+                        }
+
+                        HorizontalLayout {
+                            ButtonEx {
+                                height: 30px;
+                                font-size: 14px;
+                                background: gray;
+                                font-weight: 400;
+                                text: "CANCEL";
+                            }
+
+                            ButtonEx {
+                                height: 30px;
+                                font-size: 14px;
+                                background: red;
+                                font-weight: 400;
+                                text: "APPLY";
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

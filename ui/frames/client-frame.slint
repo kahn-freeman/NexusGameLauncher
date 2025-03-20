@@ -1,0 +1,98 @@
+
+import { SpinBox } from "std-widgets.slint";
+export component ClientFrame {
+
+    
+    in property <string> title: "";
+
+    in property <brush> title-background: #000000;
+    in property <brush> background: #3e3e3e;
+    in property <brush> title-text-color: white;
+   
+    in property <length> border-width: 0px;
+    in property <brush> border-color: #454158;
+
+    in property <length> title-height:24px;
+    in property <length> title-button-size: 24px;
+
+
+    callback on-close-window();
+
+    VerticalLayout {
+        padding: root.border-width;
+       // width: 100%;
+     
+        
+        //标题栏
+        Rectangle {
+            
+            height: title-height;
+            background: title-background;
+            HorizontalLayout {
+                padding-right: 7px;
+                padding-left: 7px;
+/*
+                Image {
+                    
+                    width:24px;
+                    height:24px;
+                    source: @image-url("../assets/icons/icon.png");
+                    image-rendering: smooth;
+                    accessible-role: none;
+                    TouchArea {
+                        pointer-event(ev) => {
+                            process-drag-event(0, ev, self.mouse-x, self.mouse-y);
+                        }
+                    }
+                }*/
+ 
+               
+
+                //标题
+                Text {
+                    text: root.title;
+                    color: title-text-color;
+                    font-weight: 500;
+                    font-size: 12px;
+                    vertical-alignment: center;
+                    horizontal-alignment: center;
+
+                }
+              
+                //关闭按钮
+                Rectangle {
+                    y: 4px;
+                    
+                    border-radius: 2px;
+                    width: title-button-size;
+                    height: title-button-size;
+                    //background: root.border-color;
+                    touch-close := TouchArea {
+                        clicked => { on-close-window() }
+                    }
+                    Text {
+                        font-size: 22px;
+                        color: touch-close.has-hover? touch-close.pressed? gray: title-text-color : gray;
+                        text: "x";
+                    }
+                }
+            }
+        }
+        
+        Rectangle {
+            width: 100%;
+            height: 100%;
+            background: background;
+            /*
+            Image {
+                y:0px;
+                opacity: 0.8;
+                source:@image-url("../assets/images/background/steampunk.jpg");
+            }*/
+            @children
+
+        }
+    }
+
+
+}

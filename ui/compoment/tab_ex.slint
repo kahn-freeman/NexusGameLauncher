@@ -1,0 +1,75 @@
+
+export component TableEx {
+    //in property <string> icon-source;  // 图片路径
+    in property <string> text;   // 按钮文字
+    in property <brush> background;
+    in property <length> font-size;
+    in property <int> font-weight;
+    callback on-clicked();
+    HorizontalLayout {
+        VerticalLayout {
+            button-touch := TouchArea {
+                Rectangle {
+                    background: button-touch.has-hover ? button-touch.pressed? background.darker(0.2):background.darker(0.1):background;
+                    
+                    //opacity: button-touch.has-hover ? button-touch.pressed ? 0.8 : 0.9 : 1;
+                    hand-text-label := Text {
+                        font-weight: font-weight;
+                        font-size: font-size;
+                        opacity: button-touch.has-hover ? button-touch.pressed ? 0.7 : 0.8 : 1;
+                        horizontal-alignment: center;
+                        text: text; // 这里使用变量
+                    }
+                }
+        
+                clicked => {
+                    on-clicked();
+                }
+            }
+        }
+
+        @children
+    }
+
+}
+export component TabPage{
+
+}
+export component TabControl {
+    // 定义包含每个 Tab 信息的数据模型
+    in property <[TabData]> tabs;
+    // 当前选中的 Tab 索引
+    in property <int> selected_index: 0;
+
+    VerticalLayout {
+        // 1. Tab 按钮区域
+        HorizontalLayout {
+            Repeater {
+                model: tabs;
+                delegate: TableEx {
+                    // 绑定 Tab 数据
+                    text: model.text;
+                    background: model.background;
+                    font-size: model.font_size;
+                    font-weight: model.font_weight;
+                    on-clicked: {
+                        // 设置选中项
+                        selected_index = index;
+                    }
+                }
+            }
+        }
+
+        // 2. Tab 内容区域
+        Container {
+            Repeater {
+                model: tabs;
+                delegate: TabPage {
+                    // 只有选中的 TabPage 可见
+                    visible: index == selected_index;
+                    // 可以在此绑定更多数据，用于显示具体内容
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,27 @@
+
+export component ButtonEx {
+    //in property <string> icon-source;  // 图片路径
+    in property <string> text;   // 按钮文字
+    in property <brush> background;
+    in property <length> font-size;
+    in property <int> font-weight;
+    callback on-clicked();
+    button-touch := TouchArea {
+        Rectangle {
+            background: button-touch.has-hover ? button-touch.pressed? background.darker(0.2):background.darker(0.1):background;
+            
+            //opacity: button-touch.has-hover ? button-touch.pressed ? 0.8 : 0.9 : 1;
+            hand-text-label := Text {
+                font-weight: font-weight;
+                font-size: font-size;
+                opacity: button-touch.has-hover ? button-touch.pressed ? 0.7 : 0.8 : 1;
+                horizontal-alignment: center;
+                text: text; // 这里使用变量
+            }
+        }
+
+        clicked => {
+            on-clicked();
+        }
+    }
+}

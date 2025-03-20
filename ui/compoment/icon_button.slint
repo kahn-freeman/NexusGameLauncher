@@ -1,0 +1,41 @@
+
+export component IconButton {
+    //in property <string> icon-source;  // 图片路径
+    in property <string> text-label;   // 按钮文字
+    in property <image> icon-source: @image-url("");
+    callback on-clicked();
+    Rectangle {
+        height: 56px;
+        width: 100%;
+
+        icon-button-touch := TouchArea {
+            VerticalLayout {
+                width: 100%;
+                spacing: 2px; // 控制图片和文本间距
+
+                HorizontalLayout {
+                    width: 100%;
+                    alignment: center; // 让图片居中
+                    Image {
+                        width: 36px;
+                        height: 36px;
+                        opacity: icon-button-touch.has-hover ? icon-button-touch.pressed ? 1 : 0.8 : 0.5;
+                        source: icon-source; // 这里使用变量
+                        image-rendering: smooth;
+                        image-fit: fill;
+                    }
+                }
+
+                hand-text-label:=Text {
+                    height: 20px;
+                    font-size: 12px;
+                    opacity: icon-button-touch.has-hover ? icon-button-touch.pressed ? 1 : 0.8 : 0.5;
+                    horizontal-alignment: center;
+                    text: text-label; // 这里使用变量
+                }
+            }
+
+            clicked => { on-clicked(); }
+        }
+    }
+}
