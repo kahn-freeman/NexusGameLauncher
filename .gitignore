@@ -1,0 +1,4 @@
+/target
+/.vscode
+*.lock
+/assets/icons/icon.ico
